@@ -1,4 +1,4 @@
-# 📱 SmartPick Informatika
+# 📱 SmartPick 
 ### Sistem Pendukung Keputusan (SPK) Rekomendasi Smartphone Berbasis K-Means Clustering & TOPSIS
 
 <p align="center">
