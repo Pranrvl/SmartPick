@@ -36,71 +36,90 @@ B64_LOGO_FULL = get_base64_file(os.path.join(ASSETS_DIR, "logo_full.png"))
 B64_LOGO_ICON = get_base64_file(os.path.join(ASSETS_DIR, "logo_icon.png"))
 
 # =============================================================================
-# BRAND IMAGE SYSTEM — Gradient phone mockups with brand colors (no API needed)
+# REAL SMARTPHONE IMAGE SYSTEM
+# Sourced from GSMArena & official databases with brand-level fallbacks
 # =============================================================================
-BRAND_STYLES = {
-    "samsung":  {"gradient": "linear-gradient(135deg, #1428A0 0%, #4A90D9 100%)", "letter": "S", "accent": "#1428A0"},
-    "apple":    {"gradient": "linear-gradient(135deg, #333333 0%, #555555 100%)", "letter": "A", "accent": "#333333"},
-    "xiaomi":   {"gradient": "linear-gradient(135deg, #FF6900 0%, #FF9A44 100%)", "letter": "X", "accent": "#FF6900"},
-    "oppo":     {"gradient": "linear-gradient(135deg, #1A8D1A 0%, #4ADE4A 100%)", "letter": "O", "accent": "#1A8D1A"},
-    "vivo":     {"gradient": "linear-gradient(135deg, #415FFF 0%, #7B93FF 100%)", "letter": "V", "accent": "#415FFF"},
-    "realme":   {"gradient": "linear-gradient(135deg, #F5C900 0%, #FFE066 100%)", "letter": "R", "accent": "#C4A000"},
-    "poco":     {"gradient": "linear-gradient(135deg, #FFD500 0%, #FFEB80 100%)", "letter": "P", "accent": "#C4A800"},
-    "oneplus":  {"gradient": "linear-gradient(135deg, #EB0028 0%, #FF5252 100%)", "letter": "1+", "accent": "#EB0028"},
-    "motorola": {"gradient": "linear-gradient(135deg, #5C2D91 0%, #8B5CF6 100%)", "letter": "M", "accent": "#5C2D91"},
-    "nothing":  {"gradient": "linear-gradient(135deg, #000000 0%, #333333 100%)", "letter": "N", "accent": "#000000"},
-    "infinix":  {"gradient": "linear-gradient(135deg, #00A5E0 0%, #66D4FF 100%)", "letter": "∞", "accent": "#00A5E0"},
-    "tecno":    {"gradient": "linear-gradient(135deg, #0066CC 0%, #3399FF 100%)", "letter": "T", "accent": "#0066CC"},
-    "iqoo":     {"gradient": "linear-gradient(135deg, #FF4500 0%, #FF7744 100%)", "letter": "iQ", "accent": "#FF4500"},
-    "honor":    {"gradient": "linear-gradient(135deg, #00539B 0%, #4D93D9 100%)", "letter": "H", "accent": "#00539B"},
-    "google":   {"gradient": "linear-gradient(135deg, #4285F4 0%, #34A853 50%, #EA4335 100%)", "letter": "G", "accent": "#4285F4"},
-    "lava":     {"gradient": "linear-gradient(135deg, #E60012 0%, #FF5252 100%)", "letter": "L", "accent": "#E60012"},
-    "itel":     {"gradient": "linear-gradient(135deg, #FF7700 0%, #FFB366 100%)", "letter": "i", "accent": "#FF7700"},
-    "hmd":      {"gradient": "linear-gradient(135deg, #003580 0%, #336FB5 100%)", "letter": "H", "accent": "#003580"},
-    "cmf":      {"gradient": "linear-gradient(135deg, #FF6600 0%, #FF9944 100%)", "letter": "C", "accent": "#FF6600"},
-    "ulefone":  {"gradient": "linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%)", "letter": "U", "accent": "#2E7D32"},
-    "acer":     {"gradient": "linear-gradient(135deg, #83B81A 0%, #A8E063 100%)", "letter": "A", "accent": "#83B81A"},
-    "alcatel":  {"gradient": "linear-gradient(135deg, #E91E63 0%, #F48FB1 100%)", "letter": "A", "accent": "#E91E63"},
-    "blackzone":{"gradient": "linear-gradient(135deg, #212121 0%, #616161 100%)", "letter": "B", "accent": "#212121"},
-    "ringme":   {"gradient": "linear-gradient(135deg, #009688 0%, #4DB6AC 100%)", "letter": "R", "accent": "#009688"},
-    "peace":    {"gradient": "linear-gradient(135deg, #607D8B 0%, #90A4AE 100%)", "letter": "P", "accent": "#607D8B"},
-    "ai+":      {"gradient": "linear-gradient(135deg, #7C4DFF 0%, #B388FF 100%)", "letter": "AI", "accent": "#7C4DFF"},
+import urllib.request
+import urllib.parse
+import re
+import json
+
+BRAND_PHONE_IMAGES = {
+    "apple": "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-15-pro.jpg",
+    "samsung": "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-a55.jpg",
+    "xiaomi": "https://fdn2.gsmarena.com/vv/bigpic/xiaomi-redmi-note-13-pro-plus.jpg",
+    "vivo": "https://fdn2.gsmarena.com/vv/bigpic/vivo-v40e.jpg",
+    "realme": "https://fdn2.gsmarena.com/vv/bigpic/realme-12-pro-plus.jpg",
+    "oppo": "https://fdn2.gsmarena.com/vv/bigpic/oppo-reno12-pro.jpg",
+    "iqoo": "https://fdn2.gsmarena.com/vv/bigpic/vivo-v40e.jpg",
+    "motorola": "https://fdn2.gsmarena.com/vv/bigpic/motorola-edge-50-pro.jpg",
+    "nothing": "https://fdn2.gsmarena.com/vv/bigpic/nothing-phone-2a.jpg",
+    "infinix": "https://upload.wikimedia.org/wikipedia/commons/d/db/Infinix_Note_60_Pro.png",
+    "poco": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Poco_M7_Pro_5G.jpg/330px-Poco_M7_Pro_5G.jpg",
+    "google": "https://fdn2.gsmarena.com/vv/bigpic/google-pixel-8.jpg",
+    "oneplus": "https://fdn2.gsmarena.com/vv/bigpic/oneplus-12.jpg",
+    "tecno": "https://fdn2.gsmarena.com/vv/bigpic/tecno-camon-30.jpg",
+    "honor": "https://fdn2.gsmarena.com/vv/bigpic/honor-200.jpg",
+    "lava": "https://fdn2.gsmarena.com/vv/bigpic/lava-blaze-curve-5g.jpg",
+    "itel": "https://fdn2.gsmarena.com/vv/bigpic/itel-color-pro-5g.jpg",
+    "hmd": "https://fdn2.gsmarena.com/vv/bigpic/hmd-skyline.jpg",
+    "cmf": "https://fdn2.gsmarena.com/vv/bigpic/nothing-cmf-phone-1.jpg",
 }
 
-def get_brand_style(brand_name):
-    """Get brand visual style; fallback to generic blue gradient."""
-    brand_key = str(brand_name).strip().lower()
-    return BRAND_STYLES.get(brand_key, {
-        "gradient": "linear-gradient(135deg, #6E6E73 0%, #A1A1A6 100%)",
-        "letter": brand_key[0].upper() if brand_key else "?",
-        "accent": "#6E6E73",
-    })
+DEFAULT_PHONE_IMAGE = "https://fdn2.gsmarena.com/vv/bigpic/xiaomi-redmi-note-13-pro-plus.jpg"
 
-def render_phone_mockup_html(brand_name, model_name, size=90):
-    """Generate a pure-CSS phone mockup with brand gradient and letter."""
-    bs = get_brand_style(brand_name)
+@st.cache_data(show_spinner=False)
+def get_phone_image_url(model: str, brand: str) -> str:
+    brand_key = str(brand).strip().lower()
+    clean_m = re.sub(r'\s*\([^)]*\)', '', str(model)).strip()
+    
+    # 1. GSMArena bigpic direct slug check
+    slug1 = re.sub(r'[^a-z0-9]+', '-', f"{brand_key} {clean_m}".lower()).strip('-')
+    slug2 = re.sub(r'[^a-z0-9]+', '-', clean_m.lower()).strip('-')
+    
+    for s in [slug1, slug2]:
+        gsm_url = f"https://fdn2.gsmarena.com/vv/bigpic/{s}.jpg"
+        try:
+            req = urllib.request.Request(gsm_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=1.2) as r:
+                if r.status == 200:
+                    return gsm_url
+        except Exception:
+            pass
+
+    # 2. Wikipedia Search API
+    try:
+        url = f"https://en.wikipedia.org/w/api.php?action=query&format=json&generator=search&gsrsearch={urllib.parse.quote(clean_m + ' smartphone')}&gsrlimit=2&prop=pageimages&piprop=thumbnail&pithumbsize=300"
+        req = urllib.request.Request(url, headers={'User-Agent': 'SmartPickApp/1.0'})
+        with urllib.request.urlopen(req, timeout=1.5) as r:
+            data = json.loads(r.read().decode('utf-8'))
+            pages = data.get('query', {}).get('pages', {})
+            for pid, p in pages.items():
+                if 'thumbnail' in p and p['thumbnail'].get('source'):
+                    src = p['thumbnail']['source']
+                    if not any(k in src.lower() for k in ['logo', 'icon', 'flag', 'svg']):
+                        return src
+    except Exception:
+        pass
+
+    return BRAND_PHONE_IMAGES.get(brand_key, DEFAULT_PHONE_IMAGE)
+
+def render_smartphone_image_html(model: str, brand: str, width: int = 75, height: int = 95):
+    img_url = get_phone_image_url(model, brand)
+    brand_key = str(brand).strip().lower()
+    fb_url = BRAND_PHONE_IMAGES.get(brand_key, DEFAULT_PHONE_IMAGE)
     return f"""<div style="
-        width: {size}px; height: {int(size * 1.25)}px; flex-shrink: 0;
-        background: {bs['gradient']};
-        border-radius: {int(size * 0.18)}px;
+        width: {width}px; height: {height}px; flex-shrink: 0;
+        background: #FFFFFF;
+        border-radius: 12px;
+        border: 1px solid rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15);
-        position: relative; overflow: hidden;
+        padding: 5px; box-sizing: border-box; overflow: hidden;
     ">
-        <div style="
-            position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-            width: {int(size * 0.22)}px; height: 4px; background: rgba(0,0,0,0.25);
-            border-radius: 2px;
-        "></div>
-        <span style="
-            font-size: {int(size * 0.32)}px; font-weight: 800; color: rgba(255,255,255,0.92);
-            letter-spacing: -0.02em; text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        ">{bs['letter']}</span>
-        <div style="
-            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-            width: {int(size * 0.2)}px; height: {int(size * 0.2)}px;
-            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%;
-        "></div>
+        <img src="{img_url}" alt="{model}" loading="lazy" style="
+            max-width: 100%; max-height: 100%; object-fit: contain;
+        " onerror="this.onerror=null; this.src='{fb_url}';" />
     </div>"""
 
 fav_file = os.path.join(ASSETS_DIR, "favicon.png")
@@ -767,12 +786,7 @@ with nav_mid:
             navigate("Hasil Rekomendasi")
 
 with nav_right:
-    st.markdown("""
-        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.5rem; padding-top: 0.35rem;">
-            <span class="apple-chip chip-neutral">758 Smartphone</span>
-            <span class="apple-chip chip-success">● SPK Aktif</span>
-        </div>
-    """, unsafe_allow_html=True)
+    pass
 
 st.markdown("<hr style='margin: 0.75rem 0 1.5rem 0; border: none; border-top: 1px solid rgba(0,0,0,0.06);' />", unsafe_allow_html=True)
 
@@ -971,178 +985,112 @@ with st.container(key=view_key):
             </p>
         """, unsafe_allow_html=True)
 
-        col_form, col_info = st.columns([6.2, 3.8], gap="large")
+        # Question 1: Budget
+        with st.container(border=True):
+            st.markdown("""
+                <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
+                    1. Rentang Anggaran (Budget)
+                </div>
+                <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
+                    Tentukan batasan harga smartphone untuk penyaringan awal alternatif dalam Rupiah (IDR).
+                </div>
+            """, unsafe_allow_html=True)
 
-        with col_form:
-            # Question 1: Budget
-            with st.container(border=True):
-                st.markdown("""
-                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
-                        1. Rentang Anggaran (Budget)
-                    </div>
-                    <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
-                        Tentukan batasan harga smartphone untuk penyaringan awal alternatif dalam Rupiah (IDR).
-                    </div>
-                """, unsafe_allow_html=True)
+            budget_options = [
+                "Di bawah Rp 2.000.000 — Entry-Level Terjangkau",
+                "Rp 2.000.000 – Rp 3.000.000 — Mid-Range Budget",
+                "Rp 3.000.000 – Rp 5.000.000 — Mid-Range Populer (Keseimbangan Spesifikasi & Harga)",
+                "Rp 5.000.000 – Rp 8.000.000 — Upper Mid-Range",
+                "Di atas Rp 10.000.000 — Flagship & Premium",
+            ]
 
-                budget_options = [
-                    "Di bawah Rp 2.000.000 — Entry-Level Terjangkau",
-                    "Rp 2.000.000 – Rp 3.000.000 — Mid-Range Budget",
-                    "Rp 3.000.000 – Rp 5.000.000 — Mid-Range Populer (Keseimbangan Spesifikasi & Harga)",
-                    "Rp 5.000.000 – Rp 8.000.000 — Upper Mid-Range",
-                    "Di atas Rp 10.000.000 — Flagship & Premium",
-                ]
+            curr_b_idx = min(max(0, st.session_state.budget_choice), len(budget_options) - 1)
+            sel_budget = st.radio(
+                "Pilih Anggaran",
+                options=budget_options,
+                index=curr_b_idx,
+                label_visibility="collapsed",
+                key="radio_budget_input"
+            )
+            st.session_state.budget_choice = budget_options.index(sel_budget)
 
-                curr_b_idx = min(max(0, st.session_state.budget_choice), len(budget_options) - 1)
-                sel_budget = st.radio(
-                    "Pilih Anggaran",
-                    options=budget_options,
-                    index=curr_b_idx,
-                    label_visibility="collapsed",
-                    key="radio_budget_input"
-                )
-                st.session_state.budget_choice = budget_options.index(sel_budget)
+        # Question 2: Usage
+        with st.container(border=True):
+            st.markdown("""
+                <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
+                    2. Smartphone ini paling sering kamu gunakan untuk apa?
+                </div>
+                <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
+                    Pilih satu kebutuhan utama yang paling mencerminkan aktivitas harianmu.
+                </div>
+            """, unsafe_allow_html=True)
 
-            # Question 2: Usage
-            with st.container(border=True):
-                st.markdown("""
-                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
-                        2. Smartphone ini paling sering kamu gunakan untuk apa?
-                    </div>
-                    <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
-                        Pilih satu kebutuhan utama yang paling mencerminkan aktivitas harianmu.
-                    </div>
-                """, unsafe_allow_html=True)
+            usage_options = [
+                "▷  Gaming — Bermain game dengan performa grafis tinggi, chipset kencang, refresh rate stabil",
+                "◎  Fotografi & Konten — Mengambil foto jernih, video resolusi tinggi & pembuatan konten",
+                "◈  Produktivitas — Kuliah, pekerjaan kantor, multitasking aplikasi & dokumen",
+                "◉  Penggunaan Sehari-hari — Komunikasi, media sosial, navigasi & daya tahan harian andal",
+                "◇  Hemat Budget — Mendapatkan smartphone fungsional dengan harga paling efisien",
+            ]
 
-                usage_options = [
-                    "🎮 Gaming — Bermain game dengan performa grafis tinggi, chipset kencang, refresh rate stabil",
-                    "📷 Fotografi & Konten — Mengambil foto jernih, video resolusi tinggi & pembuatan konten",
-                    "💼 Produktivitas — Kuliah, pekerjaan kantor, multitasking aplikasi & dokumen",
-                    "📱 Penggunaan Sehari-hari — Komunikasi, media sosial, navigasi & daya tahan harian andal",
-                    "🏷️ Hemat Budget — Mendapatkan smartphone fungsional dengan harga paling efisien",
-                ]
+            sel_usage = st.radio(
+                "Pilih Aktivitas",
+                options=usage_options,
+                index=st.session_state.usage_choice,
+                label_visibility="collapsed",
+                key="radio_usage_input"
+            )
+            st.session_state.usage_choice = usage_options.index(sel_usage)
 
-                sel_usage = st.radio(
-                    "Pilih Aktivitas",
-                    options=usage_options,
-                    index=st.session_state.usage_choice,
-                    label_visibility="collapsed",
-                    key="radio_usage_input"
-                )
-                st.session_state.usage_choice = usage_options.index(sel_usage)
+        # Question 3: Priority Checkboxes
+        with st.container(border=True):
+            st.markdown("""
+                <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
+                    3. Apa yang paling kamu prioritaskan?
+                </div>
+                <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
+                    Pilih aspek spesifik yang Anda utamakan sebagai aturan penyaringan tambahan.
+                </div>
+            """, unsafe_allow_html=True)
 
-            # Question 3: Priority Checkboxes
-            with st.container(border=True):
-                st.markdown("""
-                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.2rem;">
-                        3. Apa yang paling kamu prioritaskan?
-                    </div>
-                    <div style="font-size: 0.82rem; color: #6E6E73; margin-bottom: 0.85rem;">
-                        Pilih aspek spesifik yang Anda utamakan sebagai aturan penyaringan tambahan.
-                    </div>
-                """, unsafe_allow_html=True)
+            p1, p2 = st.columns(2)
+            with p1:
+                st.checkbox("◈  Performa dan Kecepatan CPU", value=True, key="cb_p1")
+                st.checkbox("◎  Resolusi Kamera Tinggi", value=False, key="cb_p2")
+                st.checkbox("▣  RAM & Storage Besar", value=False, key="cb_p3")
+            with p2:
+                st.checkbox("▷  Baterai Tahan Lama & Fast Charge", value=False, key="cb_p4")
+                st.checkbox("◇  Efisiensi Harga Terjangkau", value=False, key="cb_p5")
 
-                p1, p2 = st.columns(2)
-                with p1:
-                    st.checkbox("⚡ Performa dan Kecepatan CPU", value=True, key="cb_p1")
-                    st.checkbox("📷 Resolusi Kamera Tinggi", value=False, key="cb_p2")
-                    st.checkbox("💾 RAM & Storage Besar", value=False, key="cb_p3")
-                with p2:
-                    st.checkbox("🔋 Baterai Tahan Lama & Fast Charge", value=False, key="cb_p4")
-                    st.checkbox("🏷️ Efisiensi Harga Terjangkau", value=False, key="cb_p5")
+        # Action Buttons
+        ab1, ab2 = st.columns([3, 7])
+        with ab1:
+            if st.button("Reset Preferensi", use_container_width=True, key="btn_reset"):
+                st.session_state.budget_choice = 2
+                st.session_state.usage_choice = 0
+                st.rerun()
+        with ab2:
+            if st.button("Cari Rekomendasi (Hitung SPK)  →", type="primary", use_container_width=True, key="btn_calc"):
+                df_pool = DF_SMARTPHONES.copy()
+                b_idx = st.session_state.budget_choice
 
-            # Action Buttons
-            ab1, ab2 = st.columns([3, 7])
-            with ab1:
-                if st.button("Reset Preferensi", use_container_width=True, key="btn_reset"):
-                    st.session_state.budget_choice = 2
-                    st.session_state.usage_choice = 0
-                    st.rerun()
-            with ab2:
-                if st.button("Cari Rekomendasi (Hitung SPK)  →", type="primary", use_container_width=True, key="btn_calc"):
+                if b_idx == 0:
+                    df_pool = df_pool[df_pool["price_idr"] < 2000000]
+                elif b_idx == 1:
+                    df_pool = df_pool[(df_pool["price_idr"] >= 2000000) & (df_pool["price_idr"] <= 3000000)]
+                elif b_idx == 2:
+                    df_pool = df_pool[(df_pool["price_idr"] >= 3000000) & (df_pool["price_idr"] <= 5000000)]
+                elif b_idx == 3:
+                    df_pool = df_pool[(df_pool["price_idr"] >= 5000000) & (df_pool["price_idr"] <= 8000000)]
+                elif b_idx == 4:
+                    df_pool = df_pool[df_pool["price_idr"] >= 8000000]
+
+                if len(df_pool) == 0:
                     df_pool = DF_SMARTPHONES.copy()
-                    b_idx = st.session_state.budget_choice
 
-                    if b_idx == 0:
-                        df_pool = df_pool[df_pool["price_idr"] < 2000000]
-                    elif b_idx == 1:
-                        df_pool = df_pool[(df_pool["price_idr"] >= 2000000) & (df_pool["price_idr"] <= 3000000)]
-                    elif b_idx == 2:
-                        df_pool = df_pool[(df_pool["price_idr"] >= 3000000) & (df_pool["price_idr"] <= 5000000)]
-                    elif b_idx == 3:
-                        df_pool = df_pool[(df_pool["price_idr"] >= 5000000) & (df_pool["price_idr"] <= 8000000)]
-                    elif b_idx == 4:
-                        df_pool = df_pool[df_pool["price_idr"] >= 8000000]
-
-                    if len(df_pool) == 0:
-                        df_pool = DF_SMARTPHONES.copy()
-
-                    results = calculate_topsis(df_pool, WEIGHTS_DICT)
-                    st.session_state.topsis_data = results
-                    navigate("Hasil Rekomendasi")
-
-        # Right Information Cards
-        with col_info:
-            st.markdown("""
-                <div class="apple-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                        <span style="font-weight: 700; font-size: 1.05rem; color: #1D1D1F;">Bobot Ilmiah Tetap</span>
-                        <span class="apple-chip chip-neutral">∑ W = 1.000</span>
-                    </div>
-                    <p style="font-size: 0.82rem; color: #6E6E73; line-height: 1.5; margin-bottom: 1rem;">
-                        Bobot 7 kriteria dibakukan berdasarkan hasil kuesioner preferensi pengguna teruji secara objektif:
-                    </p>
-            """, unsafe_allow_html=True)
-
-            for col_name, c_info in CRITERIA.items():
-                actual_w = WEIGHTS_DICT.get(col_name, c_info["w"])
-                pct_str = f"{actual_w * 100:.1f}%"
-                type_tag = "Cost" if c_info["type"] == "Cost" else "Benefit"
-                tag_cls = "chip-cost" if c_info["type"] == "Cost" else "chip-benefit"
-                st.markdown(f"""
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.65rem; background: #F5F5F7; border-radius: 10px; margin-bottom: 0.45rem; font-size: 0.82rem;">
-                        <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            <span style="font-weight: 700; color: #1D1D1F;">{c_info['code']}</span>
-                            <span style="color: #333336;">{c_info['name']}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 0.45rem;">
-                            <span class="apple-chip {tag_cls}">{type_tag}</span>
-                            <strong style="color: #1D1D1F;">{pct_str}</strong>
-                        </div>
-                    </div>
-                """, unsafe_allow_html=True)
-
-            st.markdown("""
-                    <div style="margin-top: 1rem; padding: 0.75rem 0.9rem; background: #F5F5F7; border-radius: 10px; font-size: 0.75rem; color: #515154; line-height: 1.45;">
-                        ℹ️ Standardisasi bobot kuesioner menjamin objektivitas perangkingan tanpa bias subjektif.
-                    </div>
-                </div>
-
-                <div class="apple-card">
-                    <div style="font-weight: 700; font-size: 1.05rem; color: #1D1D1F; margin-bottom: 0.75rem;">Alur Komputasi SPK</div>
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.82rem; color: #515154;">
-                        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                            <span style="background: #1D1D1F; color: #FFF; font-size: 0.7rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span>
-                            <div><strong>Filter Anggaran:</strong> Seleksi kandidat smartphone sesuai rentang harga.</div>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                            <span style="background: #1D1D1F; color: #FFF; font-size: 0.7rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span>
-                            <div><strong>K-Means Clustering:</strong> Pemetaan segmentasi spesifikasi (2 klaster).</div>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                            <span style="background: #1D1D1F; color: #FFF; font-size: 0.7rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span>
-                            <div><strong>Normalisasi & Solusi Ideal:</strong> Komputasi jarak Euclidean D⁺ dan D⁻.</div>
-                        </div>
-                        <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                            <span style="background: #1D1D1F; color: #FFF; font-size: 0.7rem; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">4</span>
-                            <div><strong>Skor Preferensi (Vi):</strong> Perangkingan kedekatan relatif terbaik.</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1.25rem; padding-top: 0.85rem; border-top: 1px dashed rgba(0,0,0,0.1); font-size: 0.78rem; font-weight: 600; color: #6E6E73; text-align: center;">
-                        Basis Data: 758 Alternatif Smartphone
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
+                results = calculate_topsis(df_pool, WEIGHTS_DICT)
+                st.session_state.topsis_data = results
+                navigate("Hasil Rekomendasi")
 
     # =============================================================================
     # SCREEN 3: HASIL REKOMENDASI (TOP 10 CARDS)
@@ -1155,38 +1103,11 @@ with st.container(key=view_key):
         total_found = len(df_results)
         top_n = min(10, total_found)
 
-        # Header Row
-        top_l, top_r = st.columns([7, 3])
-        with top_l:
-            st.markdown("""
-                <div style="font-size: 0.76rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #6E6E73; margin-bottom: 0.25rem;">
-                    Kalkulasi Multi-Kriteria • Hasil Rekomendasi
-                </div>
-                <h2 style="font-size: 1.85rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.35rem;">
-                    Hasil Rekomendasi Smartphone Terbaik
-                </h2>
-                <p style="font-size: 0.92rem; color: #515154; margin-bottom: 0.85rem;">
-                    Daftar alternatif paling optimal berdasarkan kalkulasi kedekatan relatif solusi ideal TOPSIS dari 7 kriteria teknis.
-                </p>
-            """, unsafe_allow_html=True)
-        with top_r:
-            st.markdown(f"""
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.4rem; padding-top: 0.4rem;">
-                    <span class="apple-chip chip-neutral">Normalisasi Vektor TOPSIS</span>
-                    <span class="apple-chip chip-success">Valid ({top_n} Alternatif)</span>
-                </div>
-            """, unsafe_allow_html=True)
-
-        # Status Pill Row
-        st.markdown(f"""
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
-                <span class="apple-chip chip-neutral" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;">
-                    ✓ {top_n} Smartphone Terfilter
-                </span>
-                <span class="apple-chip chip-neutral" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;">
-                    ⚙️ 7 Kriteria Pembobotan Diterapkan
-                </span>
-            </div>
+        # Title only
+        st.markdown("""
+            <h2 style="font-size: 1.85rem; font-weight: 700; color: #1D1D1F; margin-bottom: 1.5rem;">
+                Hasil Rekomendasi dari Kriteria yang Anda Inginkan
+            </h2>
         """, unsafe_allow_html=True)
 
         # Top 10 Responsive Grid
@@ -1210,7 +1131,7 @@ with st.container(key=view_key):
 
                     brand_str = str(row.get("smartphone_brand", "")).title()
                     brand_raw = str(row.get("smartphone_brand", ""))
-                    phone_mockup = render_phone_mockup_html(brand_raw, row['model'], size=72)
+                    phone_mockup = render_smartphone_image_html(row['model'], brand_raw, width=78, height=100)
 
                     st.markdown(f"""
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -1233,11 +1154,11 @@ with st.container(key=view_key):
                             {highlight}
                         </div>
                         <div class="spec-group">
-                            <span class="spec-chip">⚡ {row['clock_speed_ghz']} GHz</span>
-                            <span class="spec-chip">💾 {int(row['ram_gb'])}GB/{int(row['storage_gb'])}GB</span>
-                            <span class="spec-chip">🔋 {int(row['battery_mah']):,} mAh</span>
-                            <span class="spec-chip">📷 {int(row['rear_camera_main_mp'])} MP</span>
-                            <span class="spec-chip">⚡ {int(row['charging_watt'])}W</span>
+                            <span class="spec-chip">◈ {row['clock_speed_ghz']} GHz</span>
+                            <span class="spec-chip">▣ {int(row['ram_gb'])}GB/{int(row['storage_gb'])}GB</span>
+                            <span class="spec-chip">▷ {int(row['battery_mah']):,} mAh</span>
+                            <span class="spec-chip">◎ {int(row['rear_camera_main_mp'])} MP</span>
+                            <span class="spec-chip">◉ {int(row['charging_watt'])}W</span>
                         </div>
                     """, unsafe_allow_html=True)
 
@@ -1305,7 +1226,7 @@ with st.container(key=view_key):
         has_5g_support = item.get("has_5g", False)
         badge_network = "5G Connected" if has_5g_support else "4G LTE"
         detail_brand_raw = str(item.get("smartphone_brand", ""))
-        detail_phone_mockup = render_phone_mockup_html(detail_brand_raw, item['model'], size=80)
+        detail_phone_mockup = render_smartphone_image_html(item['model'], detail_brand_raw, width=95, height=125)
 
         st.markdown(f"""
             <div class="apple-card" style="padding: 1.6rem;">
@@ -1376,7 +1297,7 @@ with st.container(key=view_key):
                         Jarak Euclidean ke Centroid Klaster: <strong>{dist_val}</strong>
                     </div>
                     <div style="padding: 0.6rem 0.8rem; background: #F5F5F7; border-radius: 10px; font-size: 0.78rem; color: #515154;">
-                        ⚡ Karakteristik: <strong>RAM {int(item['ram_gb'])}GB &nbsp;•&nbsp; ROM {int(item['storage_gb'])}GB &nbsp;•&nbsp; {item['clock_speed_ghz']} GHz</strong>
+                        ◈ Karakteristik: <strong>RAM {int(item['ram_gb'])}GB &nbsp;•&nbsp; ROM {int(item['storage_gb'])}GB &nbsp;•&nbsp; {item['clock_speed_ghz']} GHz</strong>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
