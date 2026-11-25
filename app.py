@@ -494,6 +494,16 @@ html {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes spinLogo {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes modalFadeIn {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
 @keyframes pulseLogo {
     0%, 100% {
         transform: scale(1);
@@ -1127,19 +1137,20 @@ with st.container(key=view_key):
                 ]
                 for text, pct in steps:
                     load_box.markdown(f"""
-                        <div style="background: rgba(255,255,255,0.96); border: 1.5px solid rgba(0,113,227,0.18); border-radius: 20px; padding: 2.2rem 1.8rem; margin: 1.5rem 0; box-shadow: 0 16px 40px rgba(0,113,227,0.12); text-align: center; backdrop-filter: blur(16px);">
-                            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1.25rem; position: relative; height: 90px;">
-                                <div style="width: 86px; height: 86px; border-radius: 50%; border: 3px solid rgba(0,113,227,0.12); border-top-color: #0071E3; animation: spinRing 0.9s linear infinite; position: absolute;"></div>
-                                <img src="data:image/png;base64,{B64_LOGO_ICON}" style="width: 52px; height: 52px; object-fit: contain; animation: pulseLogo 1.6s ease-in-out infinite; z-index: 2;" alt="SmartPick Logo" />
-                            </div>
-                            <div style="font-weight: 700; font-size: 1.15rem; color: #1D1D1F; margin-bottom: 0.35rem; letter-spacing: -0.01em;">
-                                Menganalisis Rekomendasi Smartphone
-                            </div>
-                            <div style="font-size: 0.88rem; color: #6E6E73; margin-bottom: 1.15rem; min-height: 1.4rem;">
-                                {text}
-                            </div>
-                            <div style="width: 100%; max-width: 340px; height: 6px; background: rgba(0,0,0,0.06); border-radius: 99px; margin: 0 auto; overflow: hidden;">
-                                <div style="width: {pct}%; height: 100%; background: linear-gradient(90deg, #0071E3, #42A5F5); border-radius: 99px; transition: width 0.3s ease;"></div>
+                        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9999999; display: flex; align-items: center; justify-content: center; pointer-events: all;">
+                            <div style="background: #FFFFFF; border-radius: 24px; padding: 2.8rem 2.2rem; width: 90%; max-width: 420px; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35); text-align: center; border: 1px solid rgba(255, 255, 255, 0.8); animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+                                <div style="margin: 0 auto 1.5rem auto; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; background: #F5F5F7; border-radius: 50%; box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);">
+                                    <img src="data:image/png;base64,{B64_LOGO_ICON}" style="width: 58px; height: 58px; object-fit: contain; animation: spinLogo 1.2s linear infinite;" alt="SmartPick Logo" />
+                                </div>
+                                <div style="font-weight: 700; font-size: 1.25rem; color: #1D1D1F; margin-bottom: 0.4rem; letter-spacing: -0.01em;">
+                                    Menganalisis Rekomendasi
+                                </div>
+                                <div style="font-size: 0.88rem; color: #6E6E73; margin-bottom: 1.4rem; min-height: 1.5rem; line-height: 1.4;">
+                                    {text}
+                                </div>
+                                <div style="width: 100%; height: 6px; background: #E5E5EA; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: {pct}%; height: 100%; background: #0071E3; border-radius: 99px; transition: width 0.3s ease;"></div>
+                                </div>
                             </div>
                         </div>
                     """, unsafe_allow_html=True)
