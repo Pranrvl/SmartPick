@@ -1,4 +1,5 @@
 import os
+import time
 import base64
 import streamlit as st
 import pandas as pd
@@ -485,6 +486,52 @@ html {
         filter: blur(0px);
         transform: scale(1) translate3d(0, 0, 0);
     }
+}
+
+/* Spinner & Pulse for Loading Animation */
+@keyframes spinRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulseLogo {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 4px 12px rgba(0, 113, 227, 0.25));
+    }
+    50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 8px 24px rgba(0, 113, 227, 0.45));
+    }
+}
+
+/* --- Apple Minimalist Search Input --- */
+div[data-testid="stTextInput"] {
+    margin-bottom: 0.5rem !important;
+}
+
+div[data-testid="stTextInput"] > div > div {
+    background-color: #FFFFFF !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+div[data-testid="stTextInput"] > div > div:focus-within {
+    border-color: #0071E3 !important;
+    box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.14), 0 4px 14px rgba(0, 113, 227, 0.08) !important;
+}
+
+div[data-testid="stTextInput"] input {
+    color: #1D1D1F !important;
+    font-size: 0.95rem !important;
+    padding: 0.75rem 1.1rem !important;
+}
+
+div[data-testid="stTextInput"] input::placeholder {
+    color: #86868B !important;
+    font-size: 0.92rem !important;
 }
 
 /* Container as Apple Outer Card */
@@ -1071,6 +1118,33 @@ with st.container(key=view_key):
                 st.rerun()
         with ab2:
             if st.button("Cari Rekomendasi (Hitung SPK)  →", type="primary", use_container_width=True, key="btn_calc"):
+                load_box = st.empty()
+                steps = [
+                    ("Memfilter data sesuai rentang anggaran & preferensi...", 25),
+                    ("Segmentasi K-Means Clustering (2 Klaster Karakteristik)...", 55),
+                    ("Normalisasi matriks & kalkulasi solusi ideal TOPSIS...", 85),
+                    ("Menyusun perangkingan smartphone terbaik...", 100)
+                ]
+                for text, pct in steps:
+                    load_box.markdown(f"""
+                        <div style="background: rgba(255,255,255,0.96); border: 1.5px solid rgba(0,113,227,0.18); border-radius: 20px; padding: 2.2rem 1.8rem; margin: 1.5rem 0; box-shadow: 0 16px 40px rgba(0,113,227,0.12); text-align: center; backdrop-filter: blur(16px);">
+                            <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 1.25rem; position: relative; height: 90px;">
+                                <div style="width: 86px; height: 86px; border-radius: 50%; border: 3px solid rgba(0,113,227,0.12); border-top-color: #0071E3; animation: spinRing 0.9s linear infinite; position: absolute;"></div>
+                                <img src="data:image/png;base64,{B64_LOGO_ICON}" style="width: 52px; height: 52px; object-fit: contain; animation: pulseLogo 1.6s ease-in-out infinite; z-index: 2;" alt="SmartPick Logo" />
+                            </div>
+                            <div style="font-weight: 700; font-size: 1.15rem; color: #1D1D1F; margin-bottom: 0.35rem; letter-spacing: -0.01em;">
+                                Menganalisis Rekomendasi Smartphone
+                            </div>
+                            <div style="font-size: 0.88rem; color: #6E6E73; margin-bottom: 1.15rem; min-height: 1.4rem;">
+                                {text}
+                            </div>
+                            <div style="width: 100%; max-width: 340px; height: 6px; background: rgba(0,0,0,0.06); border-radius: 99px; margin: 0 auto; overflow: hidden;">
+                                <div style="width: {pct}%; height: 100%; background: linear-gradient(90deg, #0071E3, #42A5F5); border-radius: 99px; transition: width 0.3s ease;"></div>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+                    time.sleep(0.35)
+
                 df_pool = DF_SMARTPHONES.copy()
                 b_idx = st.session_state.budget_choice
 
@@ -1090,6 +1164,7 @@ with st.container(key=view_key):
 
                 results = calculate_topsis(df_pool, WEIGHTS_DICT)
                 st.session_state.topsis_data = results
+                load_box.empty()
                 navigate("Hasil Rekomendasi")
 
     # =============================================================================
@@ -1103,67 +1178,126 @@ with st.container(key=view_key):
         total_found = len(df_results)
         top_n = min(10, total_found)
 
-        # Title only
+        # Title
         st.markdown("""
-            <h2 style="font-size: 1.85rem; font-weight: 700; color: #1D1D1F; margin-bottom: 1.5rem;">
+            <h2 style="font-size: 1.85rem; font-weight: 700; color: #1D1D1F; margin-bottom: 0.85rem;">
                 Hasil Rekomendasi dari Kriteria yang Anda Inginkan
             </h2>
         """, unsafe_allow_html=True)
 
-        # Top 10 Responsive Grid
-        grid_cols = st.columns(3)
-        for idx in range(top_n):
-            row = df_results.iloc[idx]
-            col_pos = idx % 3
-            with grid_cols[col_pos]:
-                with st.container(border=True):
-                    price_str = format_rupiah(row["price_idr"])
-                    score_str = f"{row['nilai_preferensi']:.4f}"
+        # Professional Search Bar with Real-time Filtering
+        search_col, stat_col = st.columns([7.5, 2.5])
+        with search_col:
+            search_query = st.text_input(
+                "Cari Smartphone Rekomendasi",
+                placeholder="🔍 Ketik nama smartphone, brand (Xiaomi, Vivo, Samsung, dll), prosesor, RAM...",
+                key="search_phone_input",
+                label_visibility="collapsed"
+            )
 
-                    # Highlight
-                    highlight = "Performa seimbang dan efisiensi baterai untuk penggunaan harian"
-                    if row.get("charging_watt", 0) >= 67:
-                        highlight = "Dukungan fast charging tinggi dengan efisiensi pengisian daya cepat"
-                    elif row.get("rear_camera_main_mp", 0) >= 64:
-                        highlight = "Kamera resolusi tinggi optimal untuk fotografi dan kreasi konten"
-                    elif row.get("clock_speed_ghz", 0) >= 3.0:
-                        highlight = "Kecepatan prosesor flagship untuk kebutuhan komputasi berat"
+        sq = search_query.strip().lower()
+        if sq:
+            def matches(r):
+                text_pool = f"{r['model']} {r['smartphone_brand']} {r.get('processor_name', '')} {r.get('processor_brand', '')} {int(r['ram_gb'])}gb {int(r['storage_gb'])}gb"
+                if r.get('has_5g', False):
+                    text_pool += " 5g"
+                return sq in text_pool.lower()
+            
+            display_df = df_results[df_results.apply(matches, axis=1)]
+        else:
+            display_df = df_results.head(10)
 
-                    brand_str = str(row.get("smartphone_brand", "")).title()
-                    brand_raw = str(row.get("smartphone_brand", ""))
-                    phone_mockup = render_smartphone_image_html(row['model'], brand_raw, width=78, height=100)
+        with stat_col:
+            if sq:
+                st.markdown(f"""
+                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-bottom: 0.5rem;">
+                        <span class="apple-chip chip-accent" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;">
+                            Ditemukan {len(display_df)} Smartphone
+                        </span>
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-bottom: 0.5rem;">
+                        <span class="apple-chip chip-neutral" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;">
+                            Top {min(10, total_found)} Rekomendasi
+                        </span>
+                    </div>
+                """, unsafe_allow_html=True)
 
-                    st.markdown(f"""
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <span class="apple-chip chip-neutral" style="font-weight: 700; color: #1D1D1F;">Top {idx+1}</span>
-                            <span class="apple-chip chip-accent">Skor V = {score_str}</span>
-                        </div>
-                        <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 0.5rem;">
-                            {phone_mockup}
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 0.72rem; color: #6E6E73; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.15rem;">{brand_str}</div>
-                                <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; line-height: 1.3; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    {row['model']}
-                                </div>
-                                <div style="font-size: 1.1rem; font-weight: 700; color: #1D1D1F;">
-                                    {price_str}
+        st.markdown("<div style='margin-bottom: 1rem;'></div>", unsafe_allow_html=True)
+
+        if len(display_df) == 0:
+            st.markdown(f"""
+                <div class="apple-card" style="text-align: center; padding: 3.5rem 1.5rem; margin: 1.5rem 0;">
+                    <div style="font-size: 2.8rem; margin-bottom: 0.6rem;">🔍</div>
+                    <div style="font-weight: 700; font-size: 1.25rem; color: #1D1D1F; margin-bottom: 0.35rem;">
+                        Tidak Ditemukan Smartphone yang Cocok
+                    </div>
+                    <div style="color: #6E6E73; font-size: 0.88rem; max-width: 480px; margin: 0 auto 1.5rem auto; line-height: 1.5;">
+                        Pencarian untuk <strong>"{search_query}"</strong> tidak menemukan hasil pada kriteria smartphone yang disaring. Coba periksa ejaan atau gunakan kata kunci lain (misal: nama brand, prosesor, atau kapasitas RAM).
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("← Reset Pencarian", key="btn_clear_search", type="secondary"):
+                st.session_state["search_phone_input"] = ""
+                st.rerun()
+        else:
+            display_count = len(display_df)
+            grid_cols = st.columns(3)
+            for idx in range(display_count):
+                row = display_df.iloc[idx]
+                col_pos = idx % 3
+                with grid_cols[col_pos]:
+                    with st.container(border=True):
+                        price_str = format_rupiah(row["price_idr"])
+                        score_str = f"{row['nilai_preferensi']:.4f}"
+                        rank_num = int(row.get("ranking", idx + 1))
+
+                        # Highlight
+                        highlight = "Performa seimbang dan efisiensi baterai untuk penggunaan harian"
+                        if row.get("charging_watt", 0) >= 67:
+                            highlight = "Dukungan fast charging tinggi dengan efisiensi pengisian daya cepat"
+                        elif row.get("rear_camera_main_mp", 0) >= 64:
+                            highlight = "Kamera resolusi tinggi optimal untuk fotografi dan kreasi konten"
+                        elif row.get("clock_speed_ghz", 0) >= 3.0:
+                            highlight = "Kecepatan prosesor flagship untuk kebutuhan komputasi berat"
+
+                        brand_str = str(row.get("smartphone_brand", "")).title()
+                        brand_raw = str(row.get("smartphone_brand", ""))
+                        phone_mockup = render_smartphone_image_html(row['model'], brand_raw, width=78, height=100)
+
+                        st.markdown(f"""
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span class="apple-chip chip-neutral" style="font-weight: 700; color: #1D1D1F;">Top {rank_num}</span>
+                                <span class="apple-chip chip-accent">Skor V = {score_str}</span>
+                            </div>
+                            <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 0.5rem;">
+                                {phone_mockup}
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 0.72rem; color: #6E6E73; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.15rem;">{brand_str}</div>
+                                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; line-height: 1.3; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {row['model']}
+                                    </div>
+                                    <div style="font-size: 1.1rem; font-weight: 700; color: #1D1D1F;">
+                                        {price_str}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="font-size: 0.78rem; color: #515154; min-height: 2rem; line-height: 1.45; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            {highlight}
-                        </div>
-                        <div class="spec-group">
-                            <span class="spec-chip">◈ {row['clock_speed_ghz']} GHz</span>
-                            <span class="spec-chip">▣ {int(row['ram_gb'])}GB/{int(row['storage_gb'])}GB</span>
-                            <span class="spec-chip">▷ {int(row['battery_mah']):,} mAh</span>
-                            <span class="spec-chip">◎ {int(row['rear_camera_main_mp'])} MP</span>
-                            <span class="spec-chip">◉ {int(row['charging_watt'])}W</span>
-                        </div>
-                    """, unsafe_allow_html=True)
+                            <div style="font-size: 0.78rem; color: #515154; min-height: 2rem; line-height: 1.45; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {highlight}
+                            </div>
+                            <div class="spec-group">
+                                <span class="spec-chip">◈ {row['clock_speed_ghz']} GHz</span>
+                                <span class="spec-chip">▣ {int(row['ram_gb'])}GB/{int(row['storage_gb'])}GB</span>
+                                <span class="spec-chip">▷ {int(row['battery_mah']):,} mAh</span>
+                                <span class="spec-chip">◎ {int(row['rear_camera_main_mp'])} MP</span>
+                                <span class="spec-chip">◉ {int(row['charging_watt'])}W</span>
+                            </div>
+                        """, unsafe_allow_html=True)
 
-                    if st.button("Lihat Detail Spesifikasi", key=f"btn_card_detail_{idx}", use_container_width=True, type="secondary"):
-                        navigate("Detail", row["model"])
+                        if st.button("Lihat Detail Spesifikasi", key=f"btn_card_detail_{idx}_{rank_num}", use_container_width=True, type="secondary"):
+                            navigate("Detail", row["model"])
 
         # Bottom Summary Tile
         st.markdown("""
