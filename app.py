@@ -328,17 +328,19 @@ div[data-testid="stCheckbox"] label:has(input:checked) [data-testid="stMarkdownC
 /* ==========================================================================
    NAVIGATION TAB BUTTONS (Clean Apple Header Tabs - Zero Clutter)
    ========================================================================== */
+/* Navigation Tab Buttons (Apple Segmented Capsule Style) */
 div.st-key-nav_home button,
 div.st-key-nav_search button,
 div.st-key-nav_results button {
     background: transparent !important;
     background-color: transparent !important;
-    border: none !important;
-    border-radius: 8px !important;
+    border: 1px solid transparent !important;
+    border-radius: 980px !important;
     box-shadow: none !important;
-    padding: 0.5rem 1rem !important;
-    font-size: 0.95rem !important;
-    transition: all 0.2s ease !important;
+    padding: 0.45rem 1.15rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* Inactive Nav Tabs: Clean Charcoal Gray */
@@ -346,7 +348,6 @@ div.st-key-nav_home button[kind="secondary"],
 div.st-key-nav_search button[kind="secondary"],
 div.st-key-nav_results button[kind="secondary"] {
     color: #6E6E73 !important;
-    font-weight: 500 !important;
 }
 
 div.st-key-nav_home button[kind="secondary"]:hover,
@@ -356,15 +357,15 @@ div.st-key-nav_results button[kind="secondary"]:hover {
     color: #1D1D1F !important;
 }
 
-/* Active Nav Tab: Apple Blue with Underline Bar */
+/* Active Nav Tab: Apple Solid Pill */
 div.st-key-nav_home button[kind="primary"],
 div.st-key-nav_search button[kind="primary"],
 div.st-key-nav_results button[kind="primary"] {
-    background-color: rgba(0, 113, 227, 0.08) !important;
-    color: #0071E3 !important;
-    font-weight: 700 !important;
-    border-bottom: 2.5px solid #0071E3 !important;
-    border-radius: 8px 8px 0 0 !important;
+    background-color: #0071E3 !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 113, 227, 0.28) !important;
 }
 
 /* ==========================================================================
@@ -547,32 +548,49 @@ div[data-testid="stTextInput"] input::placeholder {
 /* Container as Apple Outer Card */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #FFFFFF !important;
-    border-radius: 18px !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.025) !important;
-    padding: 1.4rem !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(0, 0, 0, 0.07) !important;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.025) !important;
+    padding: 1.5rem !important;
     margin-bottom: 1.25rem !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
 }
 
 /* Apple Standalone Card Surfaces */
 .apple-card {
     background: #FFFFFF;
-    border-radius: 18px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.025);
-    padding: 1.35rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.025);
+    padding: 1.5rem;
     margin-bottom: 1rem;
     box-sizing: border-box;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.12);
 }
 
 .apple-card-compact {
     background: #FFFFFF;
-    border-radius: 14px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-    padding: 1rem 1.15rem;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
+    padding: 1.1rem 1.25rem;
     margin-bottom: 0.75rem;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.apple-card-compact:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 }
 
 /* Apple Badges */
@@ -816,7 +834,7 @@ def navigate(page_name, phone_model=None):
 # =============================================================================
 # UNIFIED NAVIGATION BAR
 # =============================================================================
-nav_left, nav_mid, nav_right = st.columns([3.8, 4.4, 3.8])
+nav_left, nav_right = st.columns([4.2, 7.8])
 
 with nav_left:
     logo_html = f'<img src="data:image/png;base64,{B64_LOGO_FULL}" height="36" style="object-fit: contain; vertical-align: middle;" alt="SmartPick Informatika Logo" />' if B64_LOGO_FULL else '<span style="font-size: 1.25rem; font-weight: 700; color: #1D1D1F;">SmartPick</span>'
@@ -827,8 +845,8 @@ with nav_left:
         </div>
     """, unsafe_allow_html=True)
 
-with nav_mid:
-    n_c1, n_c2, n_c3 = st.columns(3)
+with nav_right:
+    n_space, n_c1, n_c2, n_c3 = st.columns([1.5, 2.8, 3.8, 3.8])
     with n_c1:
         if st.button("Beranda", key="nav_home", use_container_width=True,
                      type="primary" if st.session_state.nav_page == "Beranda" else "secondary"):
@@ -841,9 +859,6 @@ with nav_mid:
         if st.button("Hasil Rekomendasi", key="nav_results", use_container_width=True,
                      type="primary" if st.session_state.nav_page in ["Hasil Rekomendasi", "Detail"] else "secondary"):
             navigate("Hasil Rekomendasi")
-
-with nav_right:
-    pass
 
 st.markdown("<hr style='margin: 0.75rem 0 1.5rem 0; border: none; border-top: 1px solid rgba(0,0,0,0.06);' />", unsafe_allow_html=True)
 
@@ -970,6 +985,7 @@ with st.container(key=view_key):
             k = crit_keys[i]
             c_item = CRITERIA[k]
             badge_cls = "chip-cost" if c_item["type"] == "Cost" else "chip-benefit"
+            weight_pct = int(c_item.get('w', 0.1) * 100)
             with row1[i]:
                 st.markdown(f"""
                     <div class="apple-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
@@ -980,8 +996,9 @@ with st.container(key=view_key):
                             </div>
                             <div style="font-size: 0.82rem; color: #515154; line-height: 1.5;">{c_item['desc']}</div>
                         </div>
-                        <div style="margin-top: 1rem; font-size: 0.75rem; color: #6E6E73;">
-                            Satuan: <strong style="color: #1D1D1F;">{c_item['unit']}</strong>
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: #6E6E73; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Satuan: <strong style="color: #1D1D1F;">{c_item['unit']}</strong></span>
+                            <span class="apple-chip chip-neutral" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">Bobot: {weight_pct}%</span>
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -994,6 +1011,7 @@ with st.container(key=view_key):
             k = crit_keys[i]
             c_item = CRITERIA[k]
             badge_cls = "chip-cost" if c_item["type"] == "Cost" else "chip-benefit"
+            weight_pct = int(c_item.get('w', 0.1) * 100)
             with row2[i - 4]:
                 st.markdown(f"""
                     <div class="apple-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
@@ -1004,8 +1022,9 @@ with st.container(key=view_key):
                             </div>
                             <div style="font-size: 0.82rem; color: #515154; line-height: 1.5;">{c_item['desc']}</div>
                         </div>
-                        <div style="margin-top: 1rem; font-size: 0.75rem; color: #6E6E73;">
-                            Satuan: <strong style="color: #1D1D1F;">{c_item['unit']}</strong>
+                        <div style="margin-top: 1rem; font-size: 0.75rem; color: #6E6E73; display: flex; justify-content: space-between; align-items: center;">
+                            <span>Satuan: <strong style="color: #1D1D1F;">{c_item['unit']}</strong></span>
+                            <span class="apple-chip chip-neutral" style="font-size: 0.68rem; padding: 0.15rem 0.5rem;">Bobot: {weight_pct}%</span>
                         </div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -1058,7 +1077,7 @@ with st.container(key=view_key):
                 "Rp 2.000.000 – Rp 3.000.000 — Mid-Range Budget",
                 "Rp 3.000.000 – Rp 5.000.000 — Mid-Range Populer (Keseimbangan Spesifikasi & Harga)",
                 "Rp 5.000.000 – Rp 8.000.000 — Upper Mid-Range",
-                "Di atas Rp 10.000.000 — Flagship & Premium",
+                "Di atas Rp 8.000.000 — Flagship & High-End",
             ]
 
             curr_b_idx = min(max(0, st.session_state.budget_choice), len(budget_options) - 1)
@@ -1118,6 +1137,7 @@ with st.container(key=view_key):
             with p2:
                 st.checkbox("▷  Baterai Tahan Lama & Fast Charge", value=False, key="cb_p4")
                 st.checkbox("◇  Efisiensi Harga Terjangkau", value=False, key="cb_p5")
+                st.checkbox("📶  Konektivitas 5G & Jaringan Modern", value=False, key="cb_p6")
 
         # Action Buttons
         ab1, ab2 = st.columns([3, 7])
@@ -1221,16 +1241,16 @@ with st.container(key=view_key):
         with stat_col:
             if sq:
                 st.markdown(f"""
-                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-bottom: 0.5rem;">
-                        <span class="apple-chip chip-accent" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;">
+                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-top: 0.25rem;">
+                        <span class="apple-chip chip-accent" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; font-weight: 600;">
                             Ditemukan {len(display_df)} Smartphone
                         </span>
                     </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
-                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-bottom: 0.5rem;">
-                        <span class="apple-chip chip-neutral" style="padding: 0.45rem 0.85rem; font-size: 0.8rem;">
+                    <div style="display: flex; justify-content: flex-end; align-items: center; height: 100%; padding-top: 0.25rem;">
+                        <span class="apple-chip chip-neutral" style="padding: 0.5rem 0.95rem; font-size: 0.82rem; font-weight: 600;">
                             Top {min(10, total_found)} Rekomendasi
                         </span>
                     </div>
@@ -1279,26 +1299,26 @@ with st.container(key=view_key):
                         phone_mockup = render_smartphone_image_html(row['model'], brand_raw, width=78, height=100)
 
                         st.markdown(f"""
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
                                 <span class="apple-chip chip-neutral" style="font-weight: 700; color: #1D1D1F;">Top {rank_num}</span>
                                 <span class="apple-chip chip-accent">Skor V = {score_str}</span>
                             </div>
-                            <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <div style="display: flex; gap: 0.85rem; align-items: flex-start; margin-bottom: 0.5rem; height: 104px;">
                                 {phone_mockup}
                                 <div style="flex: 1; min-width: 0;">
                                     <div style="font-size: 0.72rem; color: #6E6E73; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.15rem;">{brand_str}</div>
-                                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; line-height: 1.3; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    <div style="font-size: 1.05rem; font-weight: 700; color: #1D1D1F; line-height: 1.3; margin-bottom: 0.25rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.7rem;">
                                         {row['model']}
                                     </div>
-                                    <div style="font-size: 1.1rem; font-weight: 700; color: #1D1D1F;">
+                                    <div style="font-size: 1.15rem; font-weight: 700; color: #1D1D1F; letter-spacing: -0.01em;">
                                         {price_str}
                                     </div>
                                 </div>
                             </div>
-                            <div style="font-size: 0.78rem; color: #515154; min-height: 2rem; line-height: 1.45; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            <div style="font-size: 0.8rem; color: #515154; height: 2.3rem; line-height: 1.4; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                 {highlight}
                             </div>
-                            <div class="spec-group">
+                            <div class="spec-group" style="min-height: 48px; align-content: flex-start; margin-bottom: 0.75rem;">
                                 <span class="spec-chip">◈ {row['clock_speed_ghz']} GHz</span>
                                 <span class="spec-chip">▣ {int(row['ram_gb'])}GB/{int(row['storage_gb'])}GB</span>
                                 <span class="spec-chip">▷ {int(row['battery_mah']):,} mAh</span>
